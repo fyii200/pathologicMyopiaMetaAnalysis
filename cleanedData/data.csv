@@ -1,0 +1,114 @@
+﻿study,fu_year,factor,onset,adjusted,OR,OR_lwr,OR_upr,note,n,p,covariates
+fang,18,AL,1,1,1.66,1.24,2.23,,289,0.001,"Age, Sex, MMD, AL change, G/D & FU"
+fang,18,age,1,1,1.06,1.04,1.09,,289,<0.001,"Sex, AL, MMD, AL change, G/D & FU"
+fang,18,AL change,1,1,2.26,1.64,3.12,axial change from baseline to follow-up,289,<0.001,"Age, Sex, AL, MMD, G/D & FU"
+fang,18,G/D,1,1,16,5.55,46.2,development or enlargement of peripapillary gamma and delta zones,289,<0.001,"Age, Sex, AL, MMD, AL change & FU"
+fang,18,MMD 1,1,1,NA,NA,NA,more severe MM category at aseline (1 vs 0),289,0.62,"Age, Sex, AL, AL change, G/D & FU"
+fang,18,female,1,1,NA,NA,NA,,289,0.52,"Age, AL, MMD, AL change, G/D & FU"
+fang,18,FU duration,1,1,NA,NA,NA,in years,289,0.12,"Age, Sex, AL, MMD, AL change & G/D"
+fang,18,female,0,1,2.21,1.41,3.49,,521,0.001,"Age, AL, AL change, G/D & FU"
+fang,18,age,0,1,1.03,1.01,1.04,,521,0.002,"Sex, AL, AL change, G/D & FU"
+fang,18,AL,0,1,1.2,1.05,1.37,,521,0.007,"Age, Sex, AL change, G/D & FU"
+fang,18,AL change,0,1,1.45,1.12,1.88,axial change from baseline to follow-up,521,0.005,"Age, Sex, AL, G/D & FU"
+fang,18,G/D,0,1,3.14,1.85,5.32,development or enlargement of peripapillary gamma and delta zones,521,<0.001,"Age, Sex, AL, AL change & FU"
+fang,18,FU duration,0,1,NA,NA,NA,in years,521,0.29,"Age, Sex, AL, AL change & G/D"
+foo,12,age,1,1,1.03,1.03,1.04,rr,1504,<0.001,"Sex, SER, Ethnicity, Edu & Tessellation"
+foo,12,female,1,1,1.11,0.99,1.23,rr,1504,0.06,"Age, SER, Ethnicity, Edu & Tessellation"
+foo,12,higher edu,1,1,1.08,0.99,1.23,rr,1504,0.18,"Age, Sex, SER, Ethnicity & Tessellation"
+foo,12,SER,1,1,0.93,0.89,0.96,rr,1504,<0.001,"Age, Sex, Ethnicity, Edu & Tessellation"
+foo,12,AL,1,1,1.18,1.14,1.24,rr,1504,<0.001,"Age, Sex, Ethnicity, Edu & Tessellation"
+foo,12,tessellation,1,1,2.5,2.22,2.8,rr,1504,<0.001,"Age, Sex, SER, Ethnicity & Edu"
+foo,12,indian,1,1,0.77,0.69,0.85,rr,1504,<0.001,"Age, Sex, SER, Edu & Tessellation"
+foo,12,age,0,1,1.05,1.01,1.09,rr,75,0.02,"Sex, SER, MMD, Ethnicity & Edu"
+foo,12,female,0,1,0.8,0.2,3.25,rr,75,0.75,"Age, SER, MMD, Ethnicity & Edu"
+foo,12,higher edu,0,1,1.23,0.36,4.23,rr,75,0.745,"Age, Sex, SER, MMD & Ethnicity"
+foo,12,SER,0,1,0.8,0.7,0.9,rr,75,<0.001,"Age, Sex, MMD, Ethnicity & Edu"
+foo,12,AL,0,1,2.02,1.49,2.74,rr,75,<0.001,"Age, Sex, MMD, Ethnicity & Edu"
+foo,12,indian,0,1,0.84,0.27,2.67,rr,75,0.77,"Age, Sex, SER, MMD & Edu"
+foo,12,age,1,0,1.04,1.03,1.05,rr,1504,<0.001,no
+foo,12,female,1,0,1.07,0.94,1.22,rr,1504,0.29,no
+foo,12,higher edu,1,0,0.98,0.86,1.12,rr,1504,0.76,no
+foo,12,SER,1,0,0.91,0.89,0.92,rr,1504,<0.001,no
+foo,12,AL,1,0,1.27,1.22,1.33,rr,1504,<0.001,no
+foo,12,tessellation,1,0,3.01,2.67,3.38,rr,1504,<0.001,no
+foo,12,indian,1,0,0.74,0.65,0.84,rr,1504,<0.001,no
+foo,12,age,0,0,0.97,0.92,1.04,rr,75,0.402,no
+foo,12,female,0,0,0.98,0.23,4.23,rr,75,0.98,no
+foo,12,higher edu,0,0,1.56,0.39,6.19,rr,75,0.53,no
+foo,12,SER,0,0,0.84,0.78,0.9,rr,75,<0.001,no
+foo,12,AL,0,0,1.73,1.21,2.49,rr,75,0.003,no
+foo,12,indian,0,0,0.9,0.18,4.47,rr,75,0.89,no
+hopf,5,female,0,1,5.54,0.93,32.92,,34,0.06,"Age, SER & IOP"
+hopf,5,age,0,1,0.94,0.88,1.02,,34,0.134,"Sex, SER & IOP"
+hopf,5,IOP,0,1,1.62,1.51,1.59,,34,0.035,"Age, Sex & SER"
+hopf,5,SER,0,1,0.83,0.67,1.01,,34,0.063,"Age, Sex & IOP"
+lin,5,age,0,1,0.95,0.89,1.01,,51,0.12,"Sex, SER, SER change, Edu & HTN"
+lin,5,female,0,1,9.14,2.01,41.62,,51,0.004,"Age, SER, SER change, Edu & HTN"
+lin,5,higher edu,0,1,8.24,1.94,34.91,,51,0.004,"Age, Sex, SER, SER change & HTN"
+lin,5,HTN,0,1,0.21,0.06,0.76,,51,0.017,"Age, Sex, SER, SER change & Edu"
+lin,5,SER,0,1,0.79,0.7,0.9,,51,<0.001,"Age, Sex, SER change, Edu & HTN"
+lin,5,SER change,0,1,1,0.84,1.2,change in SER from baseline to follow-up,51,0.96,"Age, Sex, SER, Edu & HTN"
+lin,5,age,0,0,NA,NA,NA,,51,0.07,no
+lin,5,female,0,0,NA,NA,NA,,51,0.02,no
+lin,5,higher edu,0,0,NA,NA,NA,,51,0.05,no
+lin,5,HTN,0,0,NA,NA,NA,,51,0.05,no
+lin,5,SER,0,0,NA,NA,NA,,51,<0.001,no
+lin,5,SER change,0,0,NA,NA,NA,,51,0.07,no
+lin,5,height,0,0,NA,NA,NA,,51,0.1,no
+lin,5,weight,0,0,NA,NA,NA,,51,0.7,no
+lin,5,diabetes,0,0,NA,NA,NA,,51,0.17,no
+lin,5,smoking,0,0,NA,NA,NA,,51,0.3,no
+lin,5,drinking,0,0,NA,NA,NA,,51,0.5,no
+lin,5,AL,0,0,NA,NA,NA,,51,0.25,no
+lin,5,AL change,0,0,NA,NA,NA,,51,0.13,no
+ueda,5,age,1,1,1.06,1.01,1.11,,2164,0.01,Sex & AL
+ueda,5,female,1,1,0.71,0.29,1.72,,2164,0.45,Age & AL
+ueda,5,AL,1,1,2.94,2.19,3.95,,2164,<0.001,Age & Sex
+ueda,5,age,1,0,0.98,0.94,1.03,age- and sex- adjusted,2164,0.49,Sex
+ueda,5,female,1,0,1.61,0.72,3.62,age- and sex- adjusted,2164,0.24,Age
+ueda,5,AL,1,0,2.94,2.19,3.95,age- and sex- adjusted,2164,<0.001,Age & Sex
+ueda,5,SER,1,0,1.53,1.01,2.32,age- and sex- adjusted,2164,0.046,Age & Sex
+ueda,5,height,1,0,0.96,0.91,1.02,age- and sex- adjusted,2164,0.24,Age & Sex
+ueda,5,BMI,1,0,1.02,0.9,1.15,age- and sex- adjusted,2164,0.77,Age & Sex
+ueda,5,systolic BP,1,0,0.99,0.97,1.01,age- and sex- adjusted,2164,0.37,Age & Sex
+ueda,5,diastolic BP,1,0,0.99,0.95,1.03,age- and sex- adjusted,2164,0.54,Age & Sex
+ueda,5,HTN,1,0,0.88,0.42,1.86,age- and sex- adjusted,2164,0.73,Age & Sex
+ueda,5,diabetes,1,0,0.47,0.11,2.1,age- and sex- adjusted,2164,0.32,Age & Sex
+ueda,5,serum total cholesterol,1,0,0.91,0.58,1.44,age- and sex- adjusted,2164,0.69,Age & Sex
+ueda,5,smoking,1,0,0.59,0.17,2.11,age- and sex- adjusted,2164,0.41,Age & Sex
+ueda,5,drinking,1,0,0.91,0.38,2.2,age- and sex- adjusted,2164,0.83,Age & Sex
+ueda,5,regular exercise,1,0,1.36,0.5,3.7,age- and sex- adjusted,2164,0.55,Age & Sex
+wong,6,age,1,1,1.1,1.1,1.2,rr,3373,<0.001,"Sex, SER, Ethnicity & Edu"
+wong,6,female,1,1,1.5,0.7,2.9,rr,3373,0.28,"Age, SER, Ethnicity & Edu"
+wong,6,SER,1,1,0.77,0.71,0.91,rr,3373,<0.001,"Age, Sex, Ethnicity & Edu"
+wong,6,higher edu,1,1,1,0.4,2.5,rr,3373,0.97,"Age, Sex, SER & Ethnicity"
+wong,6,AL,1,1,1.7,1.3,2.3,rr,3373,<0.001,"Age, Sex, Ethnicity & Edu"
+wong,6,chinese,1,1,0.9,0.4,2.5,rr,3373,0.91,"Age, Sex, SER & Edu"
+wong,6,malay,1,1,1.7,0.6,5,rr,3373,0.3,"Age, Sex, SER & Edu"
+wong,6,cataract,1,1,0.8,0.3,2.1,rr,3373,0.65,"Age, Sex, SER, Ethnicity & Edu"
+wong,6,age,0,1,1,1,1,rr,288,0.33,"Sex, SER, MMD, Ethnicity & Edu"
+wong,6,female,0,1,1.2,0.6,2.2,rr,288,0.55,"Age, SER, MMD, Ethnicity & Edu"
+wong,6,SER,0,1,0.91,0.91,1,rr,288,0.02,"Age, Sex, MMD, Ethnicity & Edu"
+wong,6,AL,0,1,1.3,1,1.6,rr,288,0.02,"Age, Sex, MMD, Ethnicity & Edu"
+wong,6,higher edu,0,1,1.67,0.83,3.33,rr,288,0.18,"Age, Sex, SER, MMD & Ethnicity"
+wong,6,chinese,0,1,0.7,0.3,1.4,rr,288,0.31,"Age, Sex, SER, MMD & Edu"
+wong,6,MMD 3 or 4,0,1,2.5,1.3,4.9,rr,288,0.009,"Age, Sex, SER, Ethnicity & Edu"
+wong,6,age,1,0,1.1,1.1,1.1,rr,3373,<0.001,no
+wong,6,female,1,0,1.2,0.6,2.5,rr,3373,0.57,no
+wong,6,SER,1,0,0.83,0.77,0.91,rr,3373,0.001,no
+wong,6,higher edu,1,0,1.1,1.25,2.5,rr,3373,0.78,no
+wong,6,AL,1,0,1.5,1.1,1.9,rr,3373,0.004,no
+wong,6,OD tilt,1,0,2,0.9,4,rr,3373,0.07,no
+wong,6,chinese,1,0,1.4,0.6,3.5,rr,3373,0.47,no
+wong,6,malay,1,0,1.6,0.6,4.5,rr,3373,0.37,no
+wong,6,cataract,1,0,2.7,1.3,5.5,rr,3373,0.006,no
+wong,6,age,0,0,1,0.9,1,rr,288,0.02,no
+wong,6,female,0,0,1.4,0.7,2.7,rr,288,0.32,no
+wong,6,SER,0,0,0.91,0.83,0.91,rr,288,0.001,no
+wong,6,AL,0,0,1.3,1.1,1.5,rr,288,0.001,no
+wong,6,higher edu,0,0,1.67,0.83,3.33,rr,288,0.14,no
+wong,6,LC,0,0,2.5,1.3,4.7,rr,288,0.005,no
+wong,6,OD tilt,0,0,2,1,4.1,rr,288,0.05,no
+wong,6,ICC,0,0,2.6,1.1,6,rr,288,0.03,no
+wong,6,cataract,0,0,1,0.6,1.9,rr,288,0.95,no
+wong,6,MMD 3 or 4,0,0,5,3.1,8.2,rr,288,<0.001,no
