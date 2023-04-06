@@ -10,7 +10,7 @@
 | :---:   | :---: | :---: |
 | **study** | Character | First author (last name) of studies included in this review: [fang](https://pubmed.ncbi.nlm.nih.gov/29371011/), [foo](https://bjo.bmj.com/content/early/2022/05/16/bjophthalmol-2021-321046.abstract), [hopf](https://pubmed.ncbi.nlm.nih.gov/34968638/), [lin](https://pubmed.ncbi.nlm.nih.gov/29691931/), [ueda](https://jamanetwork.com/journals/jamaophthalmology/fullarticle/2767416), [wong](https://iovs.arvojournals.org/article.aspx?articleid=2764775)  |
 | **fu_year** | Integer | Follow-up duration in years: 5, 6, 12 or 18  |
-| **factor** | Character | Potential factors associated with future PM outcomes |
+| **factor** | Character | Potential factors associated with future PM outcome |
 | **onset** | Boolean (0 or 1) | If 0, then *factor* pertains to PM progression (prognostic factor); otherwise, *factor* pertains to PM onset (risk factor)  |
 | **adjusted** | Boolean (0 or 1) | If 0, then the risk estimate is unadjusted; otherwise, it is adjusted for the pre-specified core factors at the very least (baseline age, sex & baseline severity of myopia)  |
 | **OR** | Numeric | Odds ratio (Note: Wong et al. & Foo et al. reported risk ratio instead) |
