@@ -99,10 +99,6 @@ text(c(-4.45,-3.85, -3.1, 1.85), 36,
 text(-5.12, c(4.8, 9.8, 11.8, 13.8, 15.8, 19.8, 21.8, 24.8, 26.8, 28.8, 31.8, 33.8), pos=4, 
      c("Age", "AL", "AL change", "Cataract", "Chinese", "Female", "G/D zones", "Higher edu", "Indian", "Malay", "SER", "Tessellation"),
      col="maroon")
-# Legend to explain what each abbreviation means
-text(-5, -1.5, pos=4, cex=0.95, font=1, col="darkblue",
-"Tessellation: tessellated fundus; Malay: Malay vs Indian; Chinese: Chinese vs Indian; Indian: Indian vs Malay; Edu: education level; FU: follow-up duration (year);
-G/D: development/ enlargement of peripapillary Gamma & Delta zones; SER/ AL change: change in SER/ AL b/w baseline and follow-up; MM: baseline MM category")
 dev.off()
 
 ## Explored prognostic factors: PN progression ##
@@ -132,10 +128,6 @@ text(c(-4.45,-3.85, -3.1, 2), 43,
 # Add text for each factor
 text(-5.1, c(5.8, 9.8, 11.8, 13.8, 19.8, 21.8, 25.8, 27.8, 29.8, 31.8, 33.8, 38.8, 40.8), pos=4, col='maroon',
      c("Age", "AL", "AL change", "Chinese", "Female", "G/D", "Higher edu", "HTN", "Indian", "IOP", "MM 3/4", "SER", "SER change"))
-# Legend to explain what each abbreviation means
-text(-5, -1.5, pos=4, cex=0.95, font=1, col='darkblue',
-     "SER/ AL change: change in SER/ AL b/w baseline and follow-up; MM 3/4: baseline MM category 3 or 4 vs category 2; Chinese: Chinese vs Malay + Indian; 
-HTN: hypertension; G/D: development/ enlargement of peripapillary Gamma & Delta zones; FU: follow-up duration (year); Edu: education level")
 dev.off()
 
 
@@ -233,7 +225,7 @@ ggsave(file=paste0(dirName, "/plots/metaOnset.pdf"), metaOnset)
 # models are used (https://journals.sagepub.com/doi/full/10.1177/21925682221110527)
 
 ## Subset of data containing only prognostic factors and studies that can be meta-analysed
-metaData <- subset(d, adjusted==1 & onset==0 & factor!="MMD 3 OR 4" & factor!="CHINESE" & factor!="SER CHANGE" & factor!="HTN" & factor!="TESSELATED FUNDUS" & factor!="IOP" & factor!="HYPERTENSION" & factor!="AL" & fu_year!=12 & fu_year!=18)
+metaData <- subset(d, adjusted==1 & onset==0 & factor!="MM 3 OR 4" & factor!="CHINESE" & factor!="SER CHANGE" & factor!="HTN" & factor!="TESSELATED FUNDUS" & factor!="IOP" & factor!="HYPERTENSION" & factor!="AL" & fu_year!=12 & fu_year!=18)
 metaData <- metaData %>% select(study, OR, OR_upr, OR_lwr, n, p, factor)
 
 ## Prognostic factor 1: baseline age (Hopf & Lin)
