@@ -4,7 +4,7 @@
 
 ### 1) ***cleanedData***: 
 
-*Cleaned dataset in CSV and xlsx formats comprising 12 columns and 113 rows. Each row corresponds to the risk estimate (odds ratio or risk ratio) and its 95% CI associated with a factor extracted from one of the six included studies. The codebook below summarises the contents of the dataset.*
+*Cleaned dataset in CSV and xlsx formats comprising 12 columns and 113 rows. Each row corresponds to the risk estimate (odds ratio or risk ratio) and its 95% CI associated with a factor extracted from one of the six included studies. The codebook below summarises the content of the dataset.*
 
 | Column name | Data type | What it is |
 | :---:   | :---: | :---: |
