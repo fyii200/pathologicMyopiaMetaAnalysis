@@ -23,4 +23,4 @@
 
 ### 2) ***code***: 
 
-R code that runs on *data.csv* in *cleanedData*.
+Reproducible R code for primary meta-analyes and sensitivity analyses.
