@@ -1,6 +1,10 @@
 # Author: Fabian SL Yii
 # Email: fabian.yii@ed.ac.uk
 
+# For the purpose of open access, the author has applied a creative commons 
+# attribution (CC BY) licence to any Author Accepted Manuscript version arising 
+# from this work.
+
 ################################################################################
 #                                 Setting up                                   #
 ################################################################################
@@ -35,6 +39,20 @@ d <- read.csv(dataPath)
 d[which(d$adjusted==1 & d$onset==0 & d$study=="wong" & d$factor=="age"),]$OR_lwr <- 0.99
 d[which(d$adjusted==1 & d$onset==0 & d$study=="wong" & d$factor=="age"),]$OR_upr <- 1.01
 
+# PM onset: convert Indians vs Malays to Malays vs Indians (reference)
+ind <- which(d$factor=="indian" & d$onset==1 & d$adjusted==1)
+d[ind,]$OR <- 1/d[ind,]$OR
+d[ind,]$OR_lwr <- 1/d[ind,]$OR_upr
+d[ind,]$OR_upr <- 1/d[ind,]$OR_lwr
+d[ind,]$factor <- "malay"
+
+# PM progression: convert Indians vs Malays to Malays vs Indians (reference)
+ind <- which(d$factor=="indian" & d$onset==0 & d$adjusted==1)
+d[ind,]$OR <- 1/d[ind,]$OR
+d[ind,]$OR_lwr <- 1/d[ind,]$OR_upr
+d[ind,]$OR_upr <- 1/d[ind,]$OR_lwr
+d[ind,]$factor <- "malay"
+
 # Convert risk ratio to odds ratio, treating incidence rate or progression rate
 # as baseline risk, whichever is appropriate.
 # Wong et al. (onset); reported 6-year incidence rate = 1.2%
@@ -60,7 +78,7 @@ d[rows,]$OR_upr <- riskratio_to_oddsratio(d[rows,]$OR_upr, 0.12)
 
 # Convert the OR and 95% CI reported by each study into the 
 # log OR (saved as "yi") and its variance (saved as "vi")
-d <- conv.wald(out=OR, ci.lb=OR_lwr, ci.ub=OR_upr, data=d, n=n, transf=log )
+d <- conv.wald(out=OR, ci.lb=OR_lwr, ci.ub=OR_upr, data=d, n=n, transf=log)
 # Capitalise the first letter of the name of each study
 d$study <- str_to_title(d$study)
 # Capitalise every letter of each factor name
@@ -68,259 +86,176 @@ d$factor <- toupper(d$factor)
 
 
 ################################################################################
-# Visualising the adjusted OR (displayed on linear scale) associated with each
-# explored factor using forest plots (without pooled estimates)
+# Visualising the adjusted OR (displayed on linear scale) associated with each #
+#  explored factor using forest plots (with meta-analysis where appropriate)   #
 ################################################################################
-## Explored risk factors: PN onset ##
-pdf(file=paste0(dirName, "/plots/PMOnsetAll.pdf"))
+
+######################## Explored risk factors: PM onset #######################            
+png(file=paste0(dirName, "/plots/PMonsetForest.png"), width=8, height=7.5, units="in", res=1500)
+d$weight <- "NA"
+                                 ## Meta-analyses ##
+##  Owing to a limited number of studies (<5) per factor, fixed-effects models  ##
+##  are used (https://journals.sagepub.com/doi/full/10.1177/21925682221110527)  ##
+# Risk factor 1: baseline age (Fang, Foo & Ueda)
+ageOnsetRows <- which(d$factor=="AGE" & d$adjusted==1 & d$onset==1 & d$study!="Foo")
+ageOnsetModel <- rma(yi=yi, vi=vi, data=d[ageOnsetRows,], measure="OR", method="EE")
+d[ageOnsetRows,]$weight <- round(weights(ageOnsetModel), 0)
+# Risk factor 2: baseline AL (Fang, Foo & Ueda)
+ALonsetRows <- which(d$factor=="AL" & d$adjusted==1 & d$onset==1 & d$study!="Foo")
+ALonsetModel <- rma(yi=yi, vi=vi, data=d[ALonsetRows,], measure="OR", method="EE")
+d[ALonsetRows,]$weight <- round(weights(ALonsetModel), 0)
+# Risk factor 3: Female (Fang, Foo & Ueda)
+femaleOnsetRows <- which(d$factor=="FEMALE" & d$adjusted==1 & d$onset==1 & d$study!="Foo" & d$study!="Fang")
+femaleOnsetModel <- rma(yi=yi, vi=vi, data=d[femaleOnsetRows,], measure="OR", method="EE")
+d[femaleOnsetRows,]$weight <- round(weights(femaleOnsetModel), 0)
+                                 ## Start plotting ##
+## set font expansion factor and use a bold font
+par(par(cex=0.5, font=2))
+## Forest plot
 dOnset <- subset(d, adjusted==1 & onset==1)
 dOnset <- dOnset[!is.na(dOnset$OR),]
+dOnset$factor <- factor(dOnset$factor, levels=c("G/D", "CATARACT", "AL CHANGE", "TESSELLATION", "MALAY", "CHINESE", "HIGHER EDU", "SER", "FEMALE", "AL", "AGE") )
+dOnset <- dOnset[order(dOnset$factor), ]
 mOnset <- rma(yi, vi, data=dOnset)
-forest(mOnset, order=factor,  cex=0.5, psize=1, atransf=exp,
-       at=log(c(0.25, 0.5, 1, 5)),
-       xlim=c(-5,3.5), ylim=c(-1,37),
-       slab=study, ilab=cbind(n, fu_year, covariates, p), 
-       ilab.xpos=c(-4.4,-3.85, -3.5, 1.7),
+forest(mOnset, cex=0.5, psize=1, atransf=exp,
+       at=log(c(0.25, 0.5, 1, 5, 10)),
+       xlim=c(-4.5, 4.2), ylim=c(-3, 58),
+       slab=study, ilab=cbind(n, fu_year, covariates, weight, p), 
+       ilab.xpos=c(-4, -3.6, -3.3, 2.45, 2.82),
        ilab.pos=4,
-       rows=c(1:4, 6:9, 11, 13, 15, 17:19, 21, 23:24, 26, 28, 30:31, 33),
-       header=c("Study", "OR [95% CI]"),
-       xlab="Adjusted Odds Ratio (OR)",
+       rows=c(1, 5, 9, 13, 17:19, 23:24, 28:29, 34:36, 41:44, 49:52),
+       header=c("Study", "OR [95% CI]   " ),
+       xlab="Adjusted Odds Ratio, OR (Log Scale)",
        addfit=FALSE)
-# Switch to bold font
+## Switch to bold font
 par(cex=0.5, font=2)
-# Add additional column headings to the plot
-text(c(-4.45,-3.85, -3.1, 1.85), 36, 
-     c("N eyes", "FU", "Adjusted for", "P"), pos=4)
-# Add text for each factor
-text(-5.12, c(4.8, 9.8, 11.8, 13.8, 15.8, 19.8, 21.8, 24.8, 26.8, 28.8, 31.8, 33.8), pos=4, 
-     c("Age", "AL", "AL change", "Cataract", "Chinese", "Female", "G/D zones", "Higher edu", "Indian", "Malay", "SER", "Tessellation"),
-     col="maroon")
+## Add additional column headings to the plot
+text(c(-4.03, -3.62, -2.64, 2.39, 2.93), 57, c("Eyes", "FU", "& Covariates", "W (%)", "P"), pos=4)
+text(-3.2, 57, "Variable", pos=4, col="maroon", font=2, cex=1.4)
+text(-0.6, 58.5, "PM Onset", pos=4, cex=2)
+## Add text for each factor
+text(-3.3, c(53.5, 45.5, 37.5, 30.5, 25.5, 20.5, 14.5, 10.5, 6.5, 2.5), pos=4, col='maroon', cex=1.4,
+     c("Baseline age", "Baseline AL", "Female", "Baseline SER", "Higher education level", "Ethnicity", "Baseline tessellated fundus", "Change in AL b/w baseline & FU", "Baseline cataract", "G/D"))
+## Gridlines
+abline(h=c(46.7, 38.7, 31.7, 27, 22, 16, 12, 8, 4, 0), lwd=0.1, lty=2)
+## Footnote
+text(-3.22, c(38,15), "*", col="maroon", cex=1.7)
+text(-2.79, -2, "* p=0.52 (female) and p=0.62 (tessellation) in Fang but OR not reported", col="maroon")
+text(-4.42, 19.5, "+", col="darkgreen", cex=1.2)
+text(-3.67, -3.5, "+ Chinese vs Indians (reference)", col="darkgreen")
+text(-4.42, c(17.5, 18.5), "^", col="darkblue", cex=1.1)
+text(-3.7, -5, "^ Malays vs Indians (reference)", col="darkblue")
+# Add diamond & text label for each pooled estimate
+text(-4.04, c(47.6, 39.6, 32.6), "Pooled w/o Foo", col="red", font=2)
+addpoly(ageOnsetModel, atransf=exp, row=47.5, cex=1.1, col="red", border="red", efac=0.4, font=2, mlab="")
+text(3.05, 47.6, ifelse(ageOnsetModel$pval<0.001, "<0.001", fmtp(ageOnsetModel$pval)), cex=1.1, col="red", font=2)
+addpoly(ALonsetModel, atransf=exp, row=39.5, cex=1.1, col="red", border="red", efac=0.4, fonts="bold", mlab="")
+text(3.05, 39.6, ifelse(ALonsetModel$pval<0.001, "<0.001", fmtp(ALonsetModel$pval)), cex=1.1, col="red", font=2)
+addpoly(femaleOnsetModel, atransf=exp, row=32.5, cex=1.1, col="red", border="red", efac=0.4, fonts="bold", mlab="")
+text(3.05, 32.6, ifelse(femaleOnsetModel$pval<0.001, "<0.001", fmtp(femaleOnsetModel$pval)), cex=1.1, font=2)
+## Save plot as png
 dev.off()
 
-## Explored prognostic factors: PN progression ##
-pdf(file=paste0(dirName, "/plots/PMProgressionAll.pdf"))
-# set font expansion factor (as in forest() above) and use a bold font
-op <- par(cex=0.5, font=2)
-# set "par" back to the original settings
-par(op)
+################### Explored prognostic factors: PM progression ##################
+png(file=paste0(dirName, "/plots/PMProgressionForest.png"), width=8, height=7.5, units="in", res=1500)
+d$weight <- "NA"
+                              ## Meta-analyses ##
+##  Owing to a limited number of studies (<5) per factor, fixed-effects models  ##
+##  are used (https://journals.sagepub.com/doi/full/10.1177/21925682221110527)  ##
+# Prognostic factor 1: baseline age (Fang, Foo, Hopf & Lin)
+ageProgRows <- which(d$factor=="AGE" & d$adjusted==1 & d$onset==0 & d$study!="Foo")
+ageProgModel <- rma(yi=yi, vi=vi, data=d[ageProgRows,], measure="OR", method="EE")
+d[ageProgRows,]$weight <- round(weights(ageProgModel), 0)
+# Prognostic factor 2: baseline AL (Fang & Foo)
+ALprogRows <- which(d$factor=="AL" & d$adjusted==1 & d$onset==0 & d$study!="Foo")
+ALprogModel <- rma(yi=yi, vi=vi, data=d[ALprogRows,], measure="OR", method="EE")
+d[ALprogRows,]$weight <- round(weights(ALprogModel), 0)
+# Prognostic factor 3: baseline SER (Foo, Hopf & Lin)
+SERprogRows <- which(d$factor=="SER" & d$adjusted==1 & d$onset==0 & d$study!="Foo")
+SERprogModel <- rma(yi=yi, vi=vi, data=d[SERprogRows,], measure="OR", method="EE")
+d[SERprogRows,]$weight <- round(weights(SERprogModel), 0)
+# Prognostic factor 4: Female sex (Foo, Hopf & Lin)
+femaleProgRows <- which(d$factor=="FEMALE" & d$adjusted==1 & d$onset==0 & d$study!="Foo")
+femaleProgModel <- rma(yi=yi, vi=vi, data=d[femaleProgRows,], measure="OR", method="EE")
+d[femaleProgRows,]$weight <- round(weights(femaleProgModel), 0)
+# Prognostic factor 5: Higher education level (Foo & Lin)
+eduProgRows <- which(d$factor=="HIGHER EDU" & d$adjusted==1 & d$onset==0 & d$study!="Foo")
+eduProgModel <- rma(yi=yi, vi=vi, data=d[eduProgRows,], measure="OR", method="EE")
+d[eduProgRows,]$weight <- round(weights(eduProgModel), 0)
+                                   ## Start plotting ##
+## set font expansion factor and use a bold font
+par(par(cex=0.5, font=2))
+## Forest plot
 dProg <- subset(d, adjusted==1 & onset==0)
 dProg <- dProg[!is.na(dProg$OR),]
+dProg$factor <- factor(dProg$factor, levels=c("G/D", "MM 3 OR 4", "HTN", "SER CHANGE", "AL CHANGE", "IOP", "MALAY", "CHINESE", "HIGHER EDU", "FEMALE", "SER", "AL", "AGE") )
+dProg <- dProg[order(dProg$factor), ]
 mProg <- rma(yi, vi, data=dProg)
-forest(mProg, order=factor,  cex=0.5, psize=1, atransf=exp,
-       at=log(c(0.25, 0.5, 1, 5)),
-       xlim=c(-5,3.5), ylim=c(-1,44),
-       slab=study, ilab=cbind(n, fu_year, covariates, p), 
-       ilab.xpos=c(-4.4,-3.85, -3.5, 1.9),
+forest(mProg, cex=0.5, psize=1, atransf=exp,
+       at=log(c(0.25, 0.5, 1, 5, 10)),
+       xlim=c(-4.5, 4.2), ylim=c(-1,72),
+       slab=study, ilab=cbind(n, fu_year, covariates, weight, p), 
+       ilab.xpos=c(-4, -3.6, -3.3, 2.45, 2.83),
        ilab.pos=4,
-       rows=c(1:5, 7:9, 11, 13, 15:19, 21, 23:25, 27, 29, 31, 33, 35:38, 40),
-       header=c("Study", "OR [95% CI]"),
-       xlab="Adjusted Odds Ratio (OR)",
+       rows=c(1, 5, 9, 13, 17, 21, 25:26, 31:33, 38:42, 47:50, 55:57, 62:66),
+       header=c("Study", "OR [95% CI]   " ),
+       xlab="Adjusted Odds Ratio, OR (Log Scale)",
        addfit=FALSE)
-# Switch to bold font
+## Switch to bold font
 par(cex=0.5, font=2)
-# Add additional column headings to the plot
-text(c(-4.45,-3.85, -3.1, 2), 43, 
-     c("N eyes", "FU", "Adjusted for", "P"), pos=4)
-# Add text for each factor
-text(-5.1, c(5.8, 9.8, 11.8, 13.8, 19.8, 21.8, 25.8, 27.8, 29.8, 31.8, 33.8, 38.8, 40.8), pos=4, col='maroon',
-     c("Age", "AL", "AL change", "Chinese", "Female", "G/D", "Higher edu", "HTN", "Indian", "IOP", "MM 3/4", "SER", "SER change"))
+## Add additional column headings to the plot
+text(c(-4.03,-3.62, -2.66, 2.37, 2.9), 71, c("Eyes", "FU", "& Covariates", "W (%)", "P"), pos=4)
+text(-3.2, 71, "Variable", pos=4, col="maroon", cex=1.4)
+text(-0.8, 73, "PM Progression", pos=4, cex=2)
+## Add text for each factor
+text(-3.3, c(67.5, 58.5, 51.5, 43.3, 34.5, 27.3, 22.4, 18.5, 14.5, 10.5, 6.4, 2.3), pos=4, col='maroon', cex=1.4,
+     c("Baseline age", "Baseline AL", "Baseline SER", "Female", "Higher education level", "Ethnicity", "Baseline IOP", "Change in AL b/w baseline & FU", "Change in SER b/w baseline & FU", "Baseline hypertension", "Baseline patchy/macular atrophy", "G/D"))
+## Gridlines
+abline(h=c(59.5, 52.5, 44.5, 35.5, 28.5, 24, 20, 16, 12, 8, 4, -0.2), lwd=0.1, lty=2)
+## Footnote
+text(-4.42, 26.5, "*", col="darkgreen", cex=1.7)
+text(-3.55, -2.2, "* Chinese vs Malays + Indians (reference)", col="darkgreen")
+text(-4.42, 25.4, "+", col="darkblue", cex=1.3)
+text(-3.78, -3.5, "+ Malays vs Indians (reference)", col="darkblue")
+# Add diamond & text label for each pooled estimate
+text(-4.06, c(60.6, 53.6, 45.6, 36.6, 29.6), "Pooled w/o Foo", col="red", font=2)
+addpoly(ageProgModel, atransf=exp, row=60.5, cex=1.1, col="red", border="red", efac=0.4, font=2, mlab="")
+text(3.05, 60.65, ifelse(ageProgModel$pval<0.001, "<0.001", fmtp(ageProgModel$pval)), cex=1.1, col="red", font=2)
+addpoly(ALprogModel, atransf=exp, row=53.5, cex=1.1, col="red", border="red", efac=0.4, font=2, mlab="")
+text(3.05, 53.6, ifelse(ALprogModel$pval<0.001, "<0.001", fmtp(ALprogModel$pval)), cex=1.1, col="red", font=2)
+addpoly(SERprogModel, atransf=exp, row=45.5, cex=1.1, col="red", border="red", efac=0.4, font=2, mlab="")
+text(3.05, 45.6, ifelse(SERprogModel$pval<0.001, "<0.001", fmtp(SERprogModel$pval)), cex=1.1, col="red", font=2)
+addpoly(femaleProgModel, atransf=exp, row=36.5, cex=1.1, col="red", border="red", efac=0.4, font=2, mlab="")
+text(3.05, 36.6, ifelse(femaleProgModel$pval<0.001, "<0.001", fmtp(femaleProgModel$pval)), cex=1.1, col="red", font=2)
+addpoly(eduProgModel, atransf=exp, row=29.5, cex=1.1, col="red", border="red", efac=0.4, font=2, mlab="")
+text(3.05, 29.6, ifelse(eduProgModel$pval<0.001, "<0.001", fmtp(eduProgModel$pval)), cex=1.1, col="red", font=2)
+## Save plot as png
 dev.off()
-
-
-################################################################################
-#                            Meta-analysis: PM onset                           #
-################################################################################
-# Owing to a limited number of studies (<5) per factor, fixed-effects models
-# are used (https://journals.sagepub.com/doi/full/10.1177/21925682221110527)
-
-## Subset of data containing only risk factors and studies that can be meta-analysed
-metaData <- subset(d, adjusted==1 & onset==1 & factor!="TESSELATED FUNDUS" & factor!="CHINESE" & factor!="MALAY" & factor!="CATARACT" & factor!="HIGHER EDU" & factor!="SER" & fu_year!=12 & fu_year!=18)
-metaData <- metaData %>% select(study, OR, OR_upr, OR_lwr, n, p, factor)
-
-## Risk factor 1: baseline age (Ueda & Wong)
-ageOnset <- subset(d, factor=="AGE" & adjusted==1 & onset==1)[3:4,]
-mAge <- rma(yi=yi, vi=vi, data=ageOnset, measure="OR", method="EE")
-summary(mAge); predict(mAge, transf=exp)
-# Add pooled OR (95% CI), N and p-value associated with baseline age
-metaData[nrow(metaData)+1,] <- c("Pooled", 1.0819, 1.1173, 1.0476, 5537, "<0.001", "AGE")
-
-## Risk factor 2: baseline AL (Ueda & Wong)
-ALOnset <- subset(d, factor=="AL" & adjusted==1 & onset==1)[3:4,]
-mAL <- rma(yi=yi, vi=vi, data=ALOnset, measure="OR", method="EE") 
-summary(mAL); predict(mAL, transf=exp)
-# Add pooled OR (95% CI), N and p-value associated with baseline AL
-metaData[nrow(metaData)+1,] <- c("Pooled", 2.2380, 2.7534, 1.8190, 5537, "<0.001", "AL")
-
-## Risk factor 3: female (Ueda & Wong)
-femaleOnset <- subset(d, factor=="FEMALE" & adjusted==1 & onset==1)[3:4,]
-mFemale <- rma(yi=yi, vi=vi, data=femaleOnset, measure="OR", method="EE") 
-summary(mFemale); predict(mFemale, transf=exp)
-# Add pooled OR (95% CI), N and p-value associated with female sex
-metaData[nrow(metaData)+1,] <- c("Pooled", 1.1176, 1.9601, 0.6373, 5537, "0.70", "FEMALE")
-
-## Forest plot (with pooled estimate for each risk factor)
-# Make sure numeric data are coded as such
-metaData[,2:5] <- sapply(metaData[,2:5], as.numeric)
-# 95% CI label
-metaData$CILabel <- paste0("[", format(round(metaData$OR_lwr,2), nsmall=2), " to ", format(round(metaData$OR_upr,2), nsmall=2), "]")
-# Specify label corresponding to the OR associated with each risk factor from each study 
-factorLabelLevels <- c("AGE : Pooled", "AGE : Wong", "AGE : Ueda",
-                       "AL : Pooled", "AL : Wong", "AL : Ueda",
-                       "FEMALE : Pooled", "FEMALE : Wong", "FEMALE : Ueda")
-metaData$factorLabel <- factor(paste(metaData$factor, ':', metaData$study), levels=factorLabelLevels)
-studyLevels <- c("Wong", "Ueda", "Pooled") # make sure the pooled estimate appears last
-metaData$study <- factor(metaData$study, levels=studyLevels )
-metaData <- metaData %>% arrange(factorLabel)
-# Specify point estimate shape: 10 (circled plus) and 22 (filled square) 
-# correspond to pooled estimate and individual estimate, respectively
-shapes <- c(10, 22, 22, 10, 22, 22, 10, 22, 22)
-# Forest plot
-p <- ggplot(metaData, aes(x=OR, y=factorLabel, xmin = OR_lwr, xmax = OR_upr, colour=study, fill=study)) +
-  geom_pointrange(shape=shapes, size=0.8) +
-  geom_vline(xintercept = 1, linetype = 3) +
-  xlab("Adjusted OR (95% CI)") +
-  theme_classic() +
-  scale_x_log10(limits = c(0.25, 4), 
-                breaks = c(0.25, 0.5, 1, 2, 4), 
-                labels = c("0.25", "0.5", "1", "2", "4"), expand = c(0,0)) +
-  theme(axis.title.y = element_blank(),
-        axis.text.y = element_blank(),
-        axis.line.y =element_blank(),
-        axis.ticks.y=element_blank(),
-        plot.margin = margin(30, 0, 20, 0),
-        legend.position = "left",
-        legend.title=element_blank(),
-        title=element_text(size=10),
-        strip.text.x = element_text(size = 12),
-        strip.background = element_blank()) +
-  guides(color = guide_legend(override.aes=list(shape = c(22,22,10)))) +
-  facet_wrap(~factor, ncol=1, scales="free_y", strip.position = "top") 
-# Table
-partitions <- c('—————————————————————————', '—————————————————————————', '—————————————————————————')
-names(partitions) <- c("AGE", "AL", "FEMALE")
-dataTable <- ggplot(metaData, aes(y = factorLabel)) +
-  xlim(c(0,3)) +
-  geom_text(aes(x = 0.05, label = n), hjust = 0) +
-  geom_text(aes(x = 1, label = round(OR,2) )) +
-  geom_text(aes(x = 2.3, label = CILabel), hjust = 1) +
-  geom_text(aes(x = 2.7, label = p)) +
-  scale_colour_identity() +
-  theme_void() + 
-  labs(subtitle="  N eyes             OR [95% CI]            P") +
-  theme(plot.margin = margin(20, 30, 40, 0)) +
-  facet_wrap(~factor, ncol=1, scales="free_y", labeller=labeller(factor=partitions)) 
-# Save combined plot (forest plot + table)
-metaOnset <- arrangeGrob(p, dataTable, widths=c(2,1.3))
-ggsave(file=paste0(dirName, "/plots/metaOnset.pdf"), metaOnset)
-
-
-################################################################################
-#                        Meta-analysis: PM progression                         #
-################################################################################
-# Owing to a limited number of studies (<5) per prognostic factor, fixed-effects 
-# models are used (https://journals.sagepub.com/doi/full/10.1177/21925682221110527)
-
-## Subset of data containing only prognostic factors and studies that can be meta-analysed
-metaData <- subset(d, adjusted==1 & onset==0 & factor!="MM 3 OR 4" & factor!="CHINESE" & factor!="SER CHANGE" & factor!="HTN" & factor!="TESSELATED FUNDUS" & factor!="IOP" & factor!="HYPERTENSION" & factor!="AL" & fu_year!=12 & fu_year!=18)
-metaData <- metaData %>% select(study, OR, OR_upr, OR_lwr, n, p, factor)
-
-## Prognostic factor 1: baseline age (Hopf & Lin)
-ageProg <- subset(d, factor=="AGE" & adjusted==1 & onset==0)[3:5,]
-mAge <- rma(yi=yi, vi=vi, data=ageProg, measure="OR", method="EE")
-summary(mAge); predict(mAge, transf=exp)
-# Add pooled OR (95% CI), N and p-value associated with baseline age
-metaData[nrow(metaData)+1,] <- c("Pooled", 0.9967, 1.0084, 0.9851, 373, "0.58", "AGE")
-
-## Prognostic factor 2: female (Hopf, Lin & Wong)
-femaleProg <- subset(d, factor=="FEMALE" & adjusted==1 & onset==0)[3:5,]
-mFemale <- rma(yi=yi, vi=vi, data=femaleProg, measure="OR", method="EE") 
-summary(mFemale); predict(mFemale, transf=exp)
-# Add pooled OR (95% CI), N and p-value associated with female sex
-metaData[nrow(metaData)+1,] <- c("Pooled", 2.2936, 4.5000, 1.1690, 373, "0.02", "FEMALE")
-
-## Prognostic factor 3: baseline SER (Hopf, Lin & Wong)
-SERprog <- subset(d, factor=="SER" & adjusted==1 & onset==0)[2:4,]
-mSER <- rma(yi=yi, vi=vi, data=SERprog, measure="OR", method="EE") 
-summary(mSER); predict(mSER, transf=exp)
-# Add pooled OR (95% CI), N and p-value associated with baseline SER
-metaData[nrow(metaData)+1,] <- c("Pooled", 0.8726, 0.9172, 0.8302, 373, "<0.001", "SER")
-
-## Prognostic factor 4: higher education level (Lin & Wong)
-eduProg <- subset(d, factor=="HIGHER EDU" & adjusted==1 & onset==0)[2:3,]
-mEdu <- rma(yi=yi, vi=vi, data=eduProg, measure="OR", method="EE") 
-summary(mEdu); predict(mEdu, transf=exp)
-# Add pooled OR (95% CI), N and p-value associated with higher education level
-metaData[nrow(metaData)+1,] <- c("Pooled", 3.1653, 7.3468, 1.3638, 339, "0.01", "HIGHER EDU")
-
-## Forest plot (with pooled estimate for each prognostic factor)
-# Make sure numeric data are coded as such
-metaData[,2:5] <- sapply(metaData[,2:5], as.numeric)
-# 95% CI label
-metaData$CILabel <- paste0("[", format(round(metaData$OR_lwr,2), nsmall=2), " to ", format(round(metaData$OR_upr,2), nsmall=2), "]")
-# Specify label corresponding to the OR associated with each prognostic factor from each study 
-factorLabelLevels <- c("AGE : Pooled", "AGE : Hopf", "AGE : Lin", "AGE : Wong",
-                       "FEMALE : Pooled", "FEMALE : Hopf","FEMALE : Lin", "FEMALE : Wong",
-                       "SER : Pooled", "SER : Hopf", "SER : Lin", "SER : Wong", 
-                       "HIGHER EDU : Pooled", "HIGHER EDU : Lin", "HIGHER EDU : Wong")
-metaData$factorLabel <- factor(paste(metaData$factor, ":", metaData$study), levels=factorLabelLevels)
-studyLevels <- c("Hopf", "Lin", "Wong", "Pooled")
-metaData$study <- factor(metaData$study, levels=studyLevels )
-metaData <- metaData %>% arrange(factorLabel)
-# Clip upper 95% CI at 10
-metaData[metaData$OR_upr>10,]$OR_upr <- 10
-# Specify point estimate shape: 10 (circled plus) and 22 (filled square) 
-# correspond to pooled estimate and individual estimate, respectively
-shapes <- c(10,22,22,22,10,22,22,22,10,22,22,22,10,22,22)
-# Forest plot
-p <- ggplot(metaData, aes(x=OR, y=factorLabel, xmin = OR_lwr, xmax = OR_upr, colour=study, fill=study)) +
-  geom_pointrange(shape=shapes, size=0.6) +
-  geom_vline(xintercept = 1, linetype = 3) +
-  xlab("Adjusted OR (95% CI)") +
-  theme_classic() +
-  scale_x_log10(limits = c(0.25, 10), 
-                breaks = c(0.25, 0.5, 1, 2, 4, 8), 
-                labels = c("0.25", "0.5", "1", "2", "4", "8"), expand = c(0,0)) +
-  theme(axis.title.y = element_blank(),
-        axis.text.y = element_blank(),
-        axis.line.y =element_blank(),
-        axis.ticks.y=element_blank(),
-        plot.margin = margin(10, 0, 2, 0),
-        legend.position = "left",
-        legend.title=element_blank(),
-        title=element_text(size=10),
-        strip.text.x = element_text(size = 11),
-        strip.background = element_blank()) +
-  guides(color = guide_legend(override.aes=list(shape = c(22,22,22,10)))) +
-  facet_wrap(~factor, ncol=1, scales="free_y", strip.position="top")
-# Table 
-partitions <- c("———————————————————————", "———————————————————————", "———————————————————————", "———————————————————————")
-names(partitions) <- c("AGE", "FEMALE", "SER", "HIGHER EDU")
-dataTable <- ggplot(metaData, aes(y = factorLabel)) +
-  xlim(c(0,3)) +
-  geom_text(aes(x = 0.1, label = n), hjust = 0, size=4) +
-  geom_text(aes(x = 0.8, label = round(OR,2)), size=4) +
-  geom_text(aes(x = 2.2, label = CILabel), hjust = 1, size=4) +
-  geom_text(aes(x = 2.7, label = p), size=4) +
-  scale_colour_identity() +
-  theme_void() + 
-  labs(subtitle="   N eyes            OR (95% CI)              P") +
-  theme(plot.margin = margin(0, 0, 29, 0),
-        plot.subtitle=element_text(size=10)) +
-  facet_wrap(~factor, ncol=1, scales='free_y', labeller=labeller(factor=partitions)) 
-# Save combined plot (forest plot + table)
-metaProgression <- arrangeGrob(p, dataTable, widths = c(2,1.3))
-ggsave(file=paste0(dirName, "/plots/metaProgression.pdf"), metaProgression)
-
 
 ################################################################################
 #                             Sensitivity analyses                             #
 ################################################################################
-# Comment out lines 357 to 363 for the first sensitivity analysis (increased risk
-# with older baseline age). Comment out lines 349-355 for the second analysis.
 
+## Part 1: substitute Wong (6-year FU; SEED cohort) with Foo (12-year FU; SEED cohort)
+# PM onset
+for(factorName in c("AGE", "AL", "FEMALE")){
+  subData <- subset(d, factor==factorName & adjusted==1 & onset==1 & study!="Wong")
+  subDataModel <- rma(yi=yi, vi=vi, data=subData, measure="OR", method="EE")
+  print(paste("===================", factorName, "==================="))
+  print(predict(subDataModel, transf=exp)); print(paste("p =",subDataModel$pval)) }
+# PM progression
+for(factorName in c("AGE", "AL", "SER", "FEMALE", "HIGHER EDU")){
+  subData <- subset(d, factor==factorName & adjusted==1 & onset==0 & study!="Wong")
+  subDataModel <- rma(yi=yi, vi=vi, data=subData, measure="OR", method="EE")
+  print(paste("===================", factorName, "==================="))
+  print(predict(subDataModel, transf=exp)); print(paste("p =",subDataModel$pval)) }
+
+## Part 2: Bias age OR reported by Wong towards lower risk and higher risk 
+# Comment out lines 266-272 for increased risk 
+# Comment out lines 258-264 for the decrased risk
 d <- read.csv(dataPath)
 
-# bias the estimate towards increased risk with older baseline age
+# Bias the estimate towards increased risk with older baseline age
 d[which(d$adjusted==1 & d$onset==0 & d$study=="wong" & d$factor=="age"),]$OR <-
   riskratio_to_oddsratio(1.03, 0.17)
 d[which(d$adjusted==1 & d$onset==0 & d$study=="wong" & d$factor=="age"),]$OR_lwr <-
@@ -328,7 +263,7 @@ d[which(d$adjusted==1 & d$onset==0 & d$study=="wong" & d$factor=="age"),]$OR_lwr
 d[which(d$adjusted==1 & d$onset==0 & d$study=="wong" & d$factor=="age"),]$OR_upr <-
   riskratio_to_oddsratio(1.04, 0.17)
 
-# bias the estimate towards decreased risk with older baseline age
+# Bias the estimate towards decreased risk with older baseline age
 d[which(d$adjusted==1 & d$onset==0 & d$study=="wong" & d$factor=="age"),]$OR <-
   riskratio_to_oddsratio(0.97, 0.17)
 d[which(d$adjusted==1 & d$onset==0 & d$study=="wong" & d$factor=="age"),]$OR_lwr <-
@@ -336,34 +271,18 @@ d[which(d$adjusted==1 & d$onset==0 & d$study=="wong" & d$factor=="age"),]$OR_lwr
 d[which(d$adjusted==1 & d$onset==0 & d$study=="wong" & d$factor=="age"),]$OR_upr <-
   riskratio_to_oddsratio(1.00, 0.17)
 
-# Convert risk ratio to odds ratio, treating incidence rate or progression rate
-# as baseline risk, whichever is appropriate.
-# Wong et al. (onset); reported 6-year incidence rate = 1.2%
-rows <- which(d$note=="rr" & d$adjusted==1 & d$onset==1 & d$study=="wong") 
-d[rows,]$OR <- riskratio_to_oddsratio(d[rows,]$OR, 0.012)
-d[rows,]$OR_lwr <- riskratio_to_oddsratio(d[rows,]$OR_lwr, 0.012)
-d[rows,]$OR_upr <- riskratio_to_oddsratio(d[rows,]$OR_upr, 0.012)
+# Convert risk ratio to odds ratio, treating progression rate as baseline risk
 # Wong et al. (progression); reported 6-year progression rate = 17%
 rows <- which(d$note=="rr" & d$adjusted==1 & d$onset==0 & d$study=="wong") 
 d[rows,]$OR <- riskratio_to_oddsratio(d[rows,]$OR, 0.17)
 d[rows,]$OR_lwr <- riskratio_to_oddsratio(d[rows,]$OR_lwr, 0.17)
 d[rows,]$OR_upr <- riskratio_to_oddsratio(d[rows,]$OR_upr, 0.17)
-# Foo et al. (onset); reported 12-year incidence rate = 10.3%
-rows <- which(d$note=="rr" & d$adjusted==1 & d$onset==1 & d$study=="foo") 
-d[rows,]$OR <- riskratio_to_oddsratio(d[rows,]$OR, 0.103)
-d[rows,]$OR_lwr <- riskratio_to_oddsratio(d[rows,]$OR_lwr, 0.103)
-d[rows,]$OR_upr <- riskratio_to_oddsratio(d[rows,]$OR_upr, 0.103)
-# Foo et al. (progression); reported 12-year progression rate = 12.0%
-rows <- which(d$note=="rr" & d$adjusted==1 & d$onset==0 & d$study=="foo") 
-d[rows,]$OR <- riskratio_to_oddsratio(d[rows,]$OR, 0.12)
-d[rows,]$OR_lwr <- riskratio_to_oddsratio(d[rows,]$OR_lwr, 0.12)
-d[rows,]$OR_upr <- riskratio_to_oddsratio(d[rows,]$OR_upr, 0.12)
-
 d <- conv.wald(out=OR, ci.lb=OR_lwr, ci.ub=OR_upr, data=d, n=n, transf=log )
 
-ageProg <- subset(d, factor=="age" & adjusted==1 & onset==0)[3:5,]
+# Meta-analysis
+ageProg <- subset(d, factor=="age" & adjusted==1 & onset==0 & study!="foo")
 mAge <- rma(yi=yi, vi=vi, data=ageProg, measure="OR", method="EE")
-summary(mAge); predict(mAge, transf=exp)
+predict(mAge, transf=exp); mAge$pval
 
 
 
