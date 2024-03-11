@@ -1,10 +1,6 @@
 # Author: Fabian Yii
 # Email: fabian.yii@ed.ac.uk
 
-# For the purpose of open access, the author has applied a creative commons 
-# attribution (CC BY) licence to any Author Accepted Manuscript version arising 
-# from this work.
-
 ################################################################################
 #                                 Setting up                                   #
 ################################################################################
