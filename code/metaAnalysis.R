@@ -1,4 +1,4 @@
-# Author: Fabian SL Yii
+# Author: Fabian Yii
 # Email: fabian.yii@ed.ac.uk
 
 # For the purpose of open access, the author has applied a creative commons 
