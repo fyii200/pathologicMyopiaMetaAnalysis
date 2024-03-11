@@ -16,7 +16,7 @@
 | **OR** | Numeric | Odds ratio (Note: Wong et al. & Foo et al. reported risk ratio instead) |
 | **OR_lwr** | Numeric | Lower limit of 95% CI |
 | **OR_upr** | Numeric | Upper limit of 95% CI |
-| **note** | Character | If "rr", then *OR*, *OR_lwr* & *OR_upr* are risk ratio, lower limit of risk ratio and upper limit of risk ratio, respectively |
+| **note** | Character | If "rr", *OR*, *OR_lwr* & *OR_upr* are risk ratio, lower limit of risk ratio and upper limit of risk ratio, respectively |
 | **n** | Integer | Number of eyes without PM at baseline (if *factor* pertains to PM onset) or with PM at baseline (if *factor* pertains to PM progression)  |
 | **p** | Numeric | P-value |
 | **covariates** | Character | If *adjusted* = 1, the reported risk estimate is adjusted for these covariates   |
