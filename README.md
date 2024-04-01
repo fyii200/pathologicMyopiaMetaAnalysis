@@ -1,6 +1,5 @@
-## Factors associated with pathologic myopia (PM) onset and progression: a systematic review & meta-analysis
-
-### Protocol prospectively registered on [PROSPERO](https://www.crd.york.ac.uk/prospero/display_record.php?ID=CRD42022378743)
+## Quick overview
+#### Protocol prospectively registered on [PROSPERO](https://www.crd.york.ac.uk/prospero/display_record.php?ID=CRD42022378743)
 
 ### 1) ***cleanedData***: 
 
@@ -24,3 +23,8 @@
 ### 2) ***code***: 
 
 Reproducible R code for primary meta-analyes and sensitivity analyses.
+
+### Citation
+```
+Yii F, Nguyen L, Strang N, Bernabeu MO, Tatham A, MacGillivray T, Dhillon D. Factors associated with pathologic myopia onset and progression: A systematic review and meta-analysis. Ophthalmic Physiol Opt. 2024; in press.
+```
