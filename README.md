@@ -26,5 +26,5 @@ Reproducible R code for primary meta-analyes and sensitivity analyses.
 
 ### Citation
 ```
-Yii F, Nguyen L, Strang N, Bernabeu MO, Tatham A, MacGillivray T, Dhillon D. Factors associated with pathologic myopia onset and progression: A systematic review and meta-analysis. Ophthalmic Physiol Opt. 2024; in press.
+Yii F, Nguyen L, Strang N, Bernabeu MO, Tatham A, MacGillivray T, Dhillon D. Factors associated with pathologic myopia onset and progression: A systematic review and meta-analysis. Ophthalmic Physiol Opt. Epub 2024 Apr. Available from: https://doi.org/10.1111/opo.13312
 ```
